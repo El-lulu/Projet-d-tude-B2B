@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGRI_LTY - Tableau de Bord</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header class="nav_bar">
+        <div class="logo">AGRI_LTY</div>
+        <a href="/" class="nav_link">Tableau de Bord</a>
+        <a href="#" class="nav_link">Mes Parcelles</a>
+        <a href="#" class="nav_link">Alerte</a>
+        <a href="#" class="nav_link">Météo</a>
+    </header>
+
+    <main class="container">
+        
+        <div class="dashboard_top">
+            <div class="alerts_container">
+            <!-- On boucle sur la liste des alertes reçues -->
+            {% for alerte in alertes_critiques %}
+                <div class="alert_box">
+                    <span>ALERTE NIVEAU 3 : </span> {{ alerte['type'] }} 
+                    (Parcelle #{{ alerte['parcelle_id'] }})
+            </div>
+            {% endfor %}
+        </div>
+
+            <div class="meteo">
+                <div class="meteo_top">
+                    <span>Météo</span>
+                    <span>Perpignan</span>
+                </div>
+                <div class="meteo_main">
+                    <span class="temperature">{{ meteo['temperature'] }} °C</span>
+                </div>
+                <div class="meteo_details">
+                    Précipitations: {{ meteo['pluie_mm'] }} mm | Humidité: {{ meteo['humidite'] }}%
+                </div>
+            </div>
+        </div>
+
+        <h1 class="dashboard_main">Tableau de bord</h1>
+
+        <div class="parcelles">
+            {% for parcelle in parcelles %}
+                <div class="parcelles_info">
+                    <strong>{{ parcelle['nom'] }}</strong><br>
+                    <small>Zone : {{ parcelle['localisation'] }}</small><br>
+                    <small>Surface : {{ parcelle['surface_ha'] }} ha</small>
+                </div>
+            {% endfor %}
+        </div>
+
+
+    </main>
+
+</body>
+</html>
