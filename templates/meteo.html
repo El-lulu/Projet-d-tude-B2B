@@ -17,7 +17,12 @@
     </header>
 
     <main class="container">
-        <h1 class="dashboard_title">Historique Météo</h1>
+        <div class="page_header">
+            <h1 class="dashboard_title">Historique Météo</h1>
+            <button class="btn_add_parcelle" onclick="ouvrirModalAjout()">
+                <span class="btn_icon">+</span> Ajouter une donnée météo
+            </button>
+        </div>
 
         <div class="meteo_card_history">
             <table class="meteo_table">
@@ -27,6 +32,7 @@
                         <th>TEMPÉRATURE</th>
                         <th>PLUIE</th>
                         <th>HUMIDITÉ</th>
+                        <th>ACTIONS</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -36,12 +42,122 @@
                         <td class="temp_cell">{{ m['temperature'] }}°C</td>
                         <td>{{ m['pluie_mm'] }} mm</td>
                         <td>{{ m['humidite'] }}%</td>
+                        <td class="actions_cell">
+                            <button class="btn_modifier_small" onclick="ouvrirModalModification('{{ m['date'] }}', {{ m['temperature'] }}, {{ m['humidite'] }}, {{ m['pluie_mm'] }})">✏️</button>
+                            <button class="btn_supprimer_small" onclick="supprimerMeteo('{{ m['date'] }}')">🗑️</button>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </main>
+
+    <div id="modalMeteo" class="modal">
+        <div class="modal_content">
+            <div class="modal_header">
+                <h2 id="modal_title">Ajouter une donnée météo</h2>
+                <button class="modal_close" onclick="fermerModal()">&times;</button>
+            </div>
+            <form onsubmit="sauvegarderMeteo(event)">
+                <input type="hidden" id="meteo_date_originale">
+                <div class="form_group">
+                    <label>Date</label>
+                    <input type="date" id="date" required>
+                </div>
+                <div class="form_group">
+                    <label>Température (°C)</label>
+                    <input type="number" id="temperature" required>
+                </div>
+                <div class="form_group">
+                    <label>Humidité (%)</label>
+                    <input type="number" id="humidite" required>
+                </div>
+                <div class="form_group">
+                    <label>Pluie (mm)</label>
+                    <input type="number" id="pluie_mm" required>
+                </div>
+                <div class="modal_footer">
+                    <button type="button" class="btn_annuler" onclick="fermerModal()">Annuler</button>
+                    <button type="submit" class="btn_sauvegarder">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function ouvrirModalAjout() {
+            document.getElementById('modal_title').textContent = 'Ajouter une donnée météo';
+            document.getElementById('meteo_date_originale').value = '';
+            document.getElementById('date').value = '';
+            document.getElementById('date').disabled = false;
+            document.getElementById('temperature').value = '';
+            document.getElementById('humidite').value = '';
+            document.getElementById('pluie_mm').value = '';
+            document.getElementById('modalMeteo').style.display = 'flex';
+        }
+
+        function ouvrirModalModification(date, temperature, humidite, pluie) {
+            document.getElementById('modal_title').textContent = 'Modifier la donnée météo';
+            document.getElementById('meteo_date_originale').value = date;
+            document.getElementById('date').value = date;
+            document.getElementById('date').disabled = true;
+            document.getElementById('temperature').value = temperature;
+            document.getElementById('humidite').value = humidite;
+            document.getElementById('pluie_mm').value = pluie;
+            document.getElementById('modalMeteo').style.display = 'flex';
+        }
+
+        function fermerModal() {
+            document.getElementById('modalMeteo').style.display = 'none';
+        }
+
+        async function sauvegarderMeteo(event) {
+            event.preventDefault();
+            const dateOriginale = document.getElementById('meteo_date_originale').value;
+            const data = {
+                date: document.getElementById('date').value,
+                temperature: parseInt(document.getElementById('temperature').value),
+                humidite: parseInt(document.getElementById('humidite').value),
+                pluie_mm: parseInt(document.getElementById('pluie_mm').value)
+            };
+
+            const url = dateOriginale ? `/api/meteo/${dateOriginale}` : '/api/meteo';
+            const method = dateOriginale ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                location.reload();
+            } else {
+                alert(result.message);
+            }
+        }
+
+        async function supprimerMeteo(date) {
+            if (confirm(`Supprimer la donnée du ${date} ?`)) {
+                const response = await fetch(`/api/meteo/${date}`, {method: 'DELETE'});
+                const result = await response.json();
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert(result.message);
+                }
+            }
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalMeteo');
+            if (event.target === modal) {
+                fermerModal();
+            }
+        }
+    </script>
 
 </body>
 </html>
