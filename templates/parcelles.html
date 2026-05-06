@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGRI_LTY - Mes Parcelles</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header class="nav_bar">
+        <div class="logo">AGRI_LTY</div>
+        <a href="/" class="nav_link">Tableau de Bord</a>
+        <a href="/parcelles" class="nav_link">Mes Parcelles</a>
+        <a href="/alerte" class="nav_link">Alerte</a>
+        <a href="/meteo" class="nav_link">Météo</a>
+    </header>
+
+    <main class="container">
+        <h1 class="dashboard_title">Mes Parcelles</h1>
+
+        <div class="parcelles_list_container">
+            {% for p in parcelles %}
+            <div class="parcelle_row_card">
+                <div class="parcelle_main_info">
+                    <div class="parcelle_name">
+                        <strong>{{ p['nom'] }}</strong>
+                        <span class="culture_badge">{{ p['type_culture'] }}</span>
+                    </div>
+                    <div class="parcelle_size">
+                        {{ p['surface_ha'] }} <small>ha</small>
+                    </div>
+                </div>
+
+                <div class="parcelle_meta">
+                    <span>{{ p['localisation'] }}</span>
+                </div>
+
+                <details class="observation_details">
+                    <summary>Historique des observations</summary>
+                    <div class="observation_content">
+                        {% set count = namespace(found=0) %}
+                        <ul class="obs_list">
+                            {% for obs in observations %}
+                                {% if obs['parcelle_id'] == p['id'] %}
+                                    <li>
+                                        <span class="obs_date">{{ obs['date'] }}</span>
+                                        <p class="obs_text">{{ obs['commentaire'] }}</p>
+                                    </li>
+                                    {% set count.found = count.found + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                        
+                    </div>
+                </details>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+</body>
+</html>
