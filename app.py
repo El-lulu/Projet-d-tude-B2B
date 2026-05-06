@@ -20,5 +20,28 @@ def index():
 
     return render_template('main.html', meteo=meteo, parcelles=parcelles, alertes_critiques=alertes_critiques)
 
+
+@app.route('/parcelles')
+def page_parcelles():
+    bdd = get_db_connection()
+    liste = bdd.execute('SELECT * FROM parcelles').fetchall()
+    bdd.close()
+    return render_template('parcelles.html', parcelles=liste)
+
+@app.route('/alerte')
+def page_alerte():
+    bdd = get_db_connection()
+    toutes_alertes = bdd.execute('SELECT * FROM alertes ORDER BY date DESC').fetchall()
+    bdd.close()
+    return render_template('alerte.html', alertes=toutes_alertes)
+
+@app.route('/meteo')
+def page_meteo():
+    bdd = get_db_connection()
+    historique_meteo = bdd.execute('SELECT * FROM meteo ORDER BY date DESC').fetchall()
+    bdd.close()
+    return render_template('meteo.html', meteo_list=historique_meteo)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
