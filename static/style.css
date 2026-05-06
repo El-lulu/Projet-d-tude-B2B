@@ -2,14 +2,18 @@ body {
     font-family: 'Segoe UI', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f5f5f5;;
+    background-color: #f5f5f5;
 }
 
 .nav_bar {
     background-color: #000000;
-    padding: 15px 30px;
+    padding: 15px 20px;
     border-bottom-left-radius: 25px;
     border-bottom-right-radius: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
 }
 
 .logo {
@@ -18,7 +22,22 @@ body {
     padding: 8px 25px;
     border-radius: 20px;
     font-weight: bold;
-    display: inline-block; 
+    display: inline-block;
+}
+
+.nav_link {
+    text-decoration: none;
+    color: #3f51b5;
+    margin: 0;
+    font-weight: bold;
+    padding: 8px 12px;
+    transition: 0.3s;
+}
+
+.nav_link:hover {
+    background-color: #3f51b5;
+    color: white;
+    border-radius: 20px;
 }
 
 .container {
@@ -32,25 +51,30 @@ body {
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 30px;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
 .alerts_container {
-    display: flex;             
-    flex-direction: column;    
-    gap: 12px;                 
-    max-height: 200px;        
-    overflow-y: auto;          
-    padding: 5px;               
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 5px;
+    flex: 1;
+    min-width: 200px;
 }
 
 .alert_box {
     background-color: rgb(157, 26, 26);
     color: white;
-    padding: 12px 20px;       
-    border-radius: 25px;       
+    padding: 12px 20px;
+    border-radius: 25px;
     display: flex;
-    align-items: center;      
+    align-items: center;
     font-weight: bold;
+    word-break: break-word;
 }
 
 .meteo {
@@ -58,8 +82,10 @@ body {
     color: white;
     padding: 20px;
     border-radius: 25px;
-    width: 280px;
+    width: 100%;
+    max-width: 280px;
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    flex-shrink: 0;
 }
 
 .meteo_top {
@@ -67,11 +93,8 @@ body {
     justify-content: space-between;
     font-size: 15px;
     margin-bottom: 15px;
-}
-
-.meteo {
-    text-align: center;
-    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .temperature {
@@ -84,6 +107,7 @@ body {
     text-align: center;
     border-top: 1px solid rgba(255,255,255,0.2);
     padding-top: 10px;
+    word-break: break-word;
 }
 
 .dashboard_main {
@@ -92,36 +116,116 @@ body {
     text-align: center;
     padding: 12px;
     border-radius: 15px;
-    font-size: 30px;
+    font-size: clamp(20px, 5vw, 30px);
     margin: 20px 0;
 }
 
 .parcelles {
-    display: flex;         
-    overflow-x: auto;     
-    gap: 15px;         
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
     padding: 20px 10px;
     width: 100%;
+    scrollbar-width: thin;
 }
 
 .parcelles_info {
-    min-width: 280px;
-    height: 150px;      
-    flex-shrink: 0;        
+    min-width: 250px;
+    height: 150px;
+    flex-shrink: 0;
     border: 2px solid #3f51b5;
-    border-radius: 15px;           
+    border-radius: 15px;
     padding: 15px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);  
-    background: white;  
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background: white;
+    word-break: break-word;
 }
 
+@media (max-width: 768px) {
+    .nav_bar {
+        justify-content: center;
+    }
+    
+    .dashboard_top {
+        flex-direction: column;
+    }
+    
+    .meteo {
+        max-width: 100%;
+    }
+    
+    .alerts_container {
+        max-height: 150px;
+    }
+    
+    .parcelles_info {
+        min-width: 220px;
+        height: 130px;
+    }
+}
 
-.nav_link {
-    text-decoration: none;
-    color: #3f51b5;
-    margin: 30px;
-    font-weight: bold;
+@media (max-width: 480px) {
+    .nav_bar {
+        padding: 15px;
+        gap: 10px;
+    }
+    
+    .logo {
+        width: 100%;
+        text-align: center;
+        padding: 8px 15px;
+    }
+    
+    .nav_link {
+        flex: 1;
+        text-align: center;
+        font-size: 14px;
+        padding: 8px 5px;
+    }
+    
+    .container {
+        padding: 15px;
+    }
+    
+    .alert_box {
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+    
+    .temperature {
+        font-size: 32px;
+    }
+    
+    .meteo_top {
+        font-size: 13px;
+    }
+    
+    .meteo_details {
+        font-size: 12px;
+    }
+    
+    .parcelles_info {
+        min-width: 200px;
+        height: 120px;
+        font-size: 14px;
+    }
+    
+    .dashboard_main {
+        font-size: clamp(18px, 6vw, 24px);
+    }
+}
+
+@media (max-width: 360px) {
+    .parcelles_info {
+        min-width: 180px;
+        height: 110px;
+        padding: 10px;
+    }
+    
+    .alert_box {
+        font-size: 12px;
+    }
 }
