@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGRI_LTY - Alertes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header class="nav_bar">
+        <div class="logo">AGRI_LTY</div>
+        <a href="/" class="nav_link">Tableau de Bord</a>
+        <a href="/parcelles" class="nav_link">Mes Parcelles</a>
+        <a href="/alerte" class="nav_link">Alerte</a>
+        <a href="/meteo" class="nav_link">Météo</a>
+    </header>
+
+    <main class="container">
+        <h1 class="dashboard_title">Alertes</h1>
+
+        <div class="alerts_summary">
+            <div class="summary_card">
+                <div class="summary_dot dot_blue_light"></div>
+                <div class="summary_text">
+                    <strong>{{ historique|selectattr('niveau', 'equalto', 1)|list|length }}</strong>
+                    <span>Niveau 1 — Vigilance</span>
+                </div>
+            </div>
+            <div class="summary_card">
+                <div class="summary_dot dot_blue_mid"></div>
+                <div class="summary_text">
+                    <strong>{{ historique|selectattr('niveau', 'equalto', 2)|list|length }}</strong>
+                    <span>Niveau 2 — Attention</span>
+                </div>
+            </div>
+            <div class="summary_card">
+                <div class="summary_dot dot_blue_dark"></div>
+                <div class="summary_text">
+                    <strong>{{ historique|selectattr('niveau', 'equalto', 3)|list|length }}</strong>
+                    <span>Niveau 3 — Critique</span>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="section_subtitle">Toutes les alertes</h3>
+
+        <div class="alert_history_container">
+            {% for a in historique %}
+            <div class="alert_history_item level-{{ a['niveau'] }}">
+                <div class="alert_left_content">
+                    <div class="badge_n{{ a['niveau'] }}">N{{ a['niveau'] }}</div>
+                    <div class="alert_info_side">
+                        <strong>{{ a['type'] }}</strong>
+                        <small>Parcelle : {{ a['parcelle_nom'] }}</small>
+                    </div>
+                </div>
+                <div class="obs_date">{{ a['date'] }}</div>
+            </div>
+            {% else %}
+            <p class="no_obs">Aucune alerte enregistrée dans l'historique.</p>
+            {% endfor %}
+        </div>
+    </main>
+
+</body>
+</html>

@@ -37,9 +37,16 @@ def page_parcelles():
 @app.route('/alerte')
 def page_alerte():
     bdd = get_db_connection()
-    toutes_alertes = bdd.execute('SELECT * FROM alertes ORDER BY date DESC').fetchall()
+    # Jointure pour récupérer le nom de la parcelle au lieu de juste l'ID
+    query = '''
+        SELECT a.*, p.nom AS parcelle_nom 
+        FROM alertes a 
+        JOIN parcelles p ON a.parcelle_id = p.id 
+        ORDER BY a.date DESC
+    '''
+    historique = bdd.execute(query).fetchall()
     bdd.close()
-    return render_template('alerte.html', alertes=toutes_alertes)
+    return render_template('alerte.html', historique=historique)
 
 @app.route('/meteo')
 def page_meteo():
