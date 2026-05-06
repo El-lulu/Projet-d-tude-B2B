@@ -17,10 +17,11 @@
     </header>
 
     <main class="container">
-        
+
+        <h1 class="dashboard_title">Tableau de bord</h1>
+
         <div class="dashboard_top">
             <div class="alerts_container">
-            <!-- On boucle sur la liste des alertes reçues -->
             {% for alerte in alertes_critiques %}
                 <div class="alert_box">
                     <span>ALERTE NIVEAU 3 : </span> {{ alerte['type'] }} 
@@ -43,7 +44,9 @@
             </div>
         </div>
 
-        <h1 class="dashboard_main">Tableau de bord</h1>
+    
+        <h1 class="parcelles_title">Mes parcelles :</h1>
+        
 
         <div class="parcelles">
             {% for parcelle in parcelles %}

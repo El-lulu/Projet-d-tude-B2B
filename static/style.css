@@ -55,6 +55,10 @@ body {
     flex-wrap: wrap;
 }
 
+.dashboard_title{
+        font-size: 60px;    
+    }
+
 .alerts_container {
     display: flex;
     flex-direction: column;
@@ -121,28 +125,29 @@ body {
 }
 
 .parcelles {
-    display: flex;
-    overflow-x: auto;
-    gap: 15px;
-    padding: 20px 10px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); 
+    gap: 20px;          
+    padding: 20px 0;
     width: 100%;
-    scrollbar-width: thin;
 }
 
 .parcelles_info {
-    min-width: 250px;
-    height: 150px;
-    flex-shrink: 0;
-    border: 2px solid #3f51b5;
-    border-radius: 15px;
-    padding: 15px;
+    background: white;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    background: white;
-    word-break: break-word;
+    justify-content: space-between;
+    min-height: 160px;
+    transition: transform 0.2s ease;
+    border: 1px solid #eee;
 }
+
+
 
 @media (max-width: 768px) {
     .nav_bar {
@@ -165,6 +170,8 @@ body {
         min-width: 220px;
         height: 130px;
     }
+
+
 }
 
 @media (max-width: 480px) {
