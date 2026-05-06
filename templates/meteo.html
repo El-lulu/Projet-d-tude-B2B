@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGRI_LTY - Météo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header class="nav_bar">
+        <div class="logo">AGRI_LTY</div>
+        <a href="/" class="nav_link">Tableau de Bord</a>
+        <a href="/parcelles" class="nav_link">Mes Parcelles</a>
+        <a href="/alerte" class="nav_link">Alerte</a>
+        <a href="/meteo" class="nav_link">Météo</a>
+    </header>
+
+    <main class="container">
+        <h1 class="dashboard_title">Historique Météo</h1>
+
+        <div class="meteo_card_history">
+            <table class="meteo_table">
+                <thead>
+                    <tr>
+                        <th>DATE</th>
+                        <th>TEMPÉRATURE</th>
+                        <th>PLUIE</th>
+                        <th>HUMIDITÉ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in historique %}
+                    <tr>
+                        <td class="date_cell">{{ m['date'] }}</td>
+                        <td class="temp_cell">{{ m['temperature'] }}°C</td>
+                        <td>{{ m['pluie_mm'] }} mm</td>
+                        <td>{{ m['humidite'] }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+</body>
+</html>

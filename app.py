@@ -24,9 +24,15 @@ def index():
 @app.route('/parcelles')
 def page_parcelles():
     bdd = get_db_connection()
-    liste = bdd.execute('SELECT * FROM parcelles').fetchall()
+    # On récupère les parcelles
+    parcelles = bdd.execute('SELECT * FROM parcelles').fetchall()
+    
+    # On récupère toutes les observations
+    # J'assume que ta table a les colonnes 'parcelle_id' et 'texte'
+    observations = bdd.execute('SELECT * FROM observations').fetchall()
     bdd.close()
-    return render_template('parcelles.html', parcelles=liste)
+    
+    return render_template('parcelles.html', parcelles=parcelles, observations=observations)
 
 @app.route('/alerte')
 def page_alerte():
@@ -38,9 +44,9 @@ def page_alerte():
 @app.route('/meteo')
 def page_meteo():
     bdd = get_db_connection()
-    historique_meteo = bdd.execute('SELECT * FROM meteo ORDER BY date DESC').fetchall()
+    historique = bdd.execute('SELECT * FROM meteo ORDER BY date DESC').fetchall()
     bdd.close()
-    return render_template('meteo.html', meteo_list=historique_meteo)
+    return render_template('meteo.html', historique=historique)
 
 
 if __name__ == '__main__':
