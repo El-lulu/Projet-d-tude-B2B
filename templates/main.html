@@ -21,14 +21,25 @@
         <h1 class="dashboard_title">Tableau de bord</h1>
 
         <div class="dashboard_top">
-            <div class="alerts_container">
-            {% for alerte in alertes_critiques %}
-                <div class="alert_box">
-                    <span>ALERTE NIVEAU 3 : </span> {{ alerte['type'] }} 
-                    (Parcelle #{{ alerte['parcelle_id'] }})
+            <div class="alerts_card">
+                
+                <div class="alerts_header">
+                    <strong>{{ alertes_critiques|length }} alertes critiques</strong>
+                </div>
+
+                <div class="alerts_container">
+                    {% for alerte in alertes_critiques %}
+                        <div class="alert_box">
+                            <div class="alert_content">
+                                <span>ALERTE : {{ alerte['type'] }}</span>
+                                <small>Parcelle #{{ alerte['parcelle_id'] }}</small>
+                            </div>
+                            <div class="alert_badge">Niveau 3 d'alerte</div>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
-            {% endfor %}
-        </div>
+        
 
             <div class="meteo">
                 <div class="meteo_top">
