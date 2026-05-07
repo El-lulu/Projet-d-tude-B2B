@@ -13,6 +13,8 @@ Lancement de l'application :
 
 python app.py
 
+Accéder à l'application
+Ouvrez votre navigateur à l'adresse : http://localhost:500
 
 
 Projet développé de Luca, Yacir et Thomas
