@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGRI_LTY - Mes Parcelles</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header class="nav_bar">
+        <div class="logo">AGRI_LTY</div>
+        <a href="/" class="nav_link">Tableau de Bord</a>
+        <a href="/parcelles" class="nav_link">Mes Parcelles</a>
+        <a href="/alerte" class="nav_link">Alerte</a>
+        <a href="/meteo" class="nav_link">Météo</a>
+    </header>
+
+    <main class="container">
+        <div class="page_header">
+            <h1 class="dashboard_title">Mes Parcelles</h1>
+            <button class="btn_add_parcelle" onclick="ouvrirModalAjout()">
+                <span class="btn_icon">+</span> Ajouter une parcelle
+            </button>
+        </div>
+
+        <div class="parcelles_list_container">
+            {% for p in parcelles %}
+            <div class="parcelle_row_card">
+                <div class="parcelle_main_info">
+                    <div class="parcelle_name">
+                        <strong>{{ p['nom'] }}</strong>
+                    </div>
+                    <div class="parcelle_size">
+                        {{ p['surface_ha'] }} <small>ha</small>
+                    </div>
+                </div>
+
+                <div class="parcelle_meta">
+                    <span>{{ p['localisation'] }}</span>
+                </div>
+
+                <div class="parcelle_actions">
+                    <button class="btn_modifier" onclick="ouvrirModalModification({{ p['id'] }}, '{{ p['nom'] }}', '{{ p['localisation'] }}', {{ p['surface_ha'] }})">
+                        Modifier
+                    </button>
+                    <button class="btn_observation" onclick="ouvrirModalObservation({{ p['id'] }}, '{{ p['nom'] }}')">
+                        + Observation
+                    </button>
+                    <button class="btn_supprimer" onclick="supprimerParcelle({{ p['id'] }}, '{{ p['nom'] }}')">
+                        Supprimer
+                    </button>
+                </div>
+
+                <details class="observation_details">
+                    <summary>Historique des observations</summary>
+                    <div class="observation_content">
+                        <ul class="obs_list">
+                            {% for obs in observations %}
+                                {% if obs['parcelle_id'] == p['id'] %}
+                                    <li>
+                                        <div class="obs_header">
+                                            <span class="obs_date">{{ obs['date'] }}</span>
+                                            <span class="obs_etat">{{ obs['etat'] }}</span>
+                                            <button class="btn_supprimer_obs" onclick="supprimerObservation({{ obs['id'] }})" title="Supprimer">×</button>
+                                        </div>
+                                        <p class="obs_text">{{ obs['commentaire'] }}</p>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </details>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <!-- Modal pour ajouter/modifier une parcelle -->
+    <div id="modalParcelle" class="modal">
+        <div class="modal_content">
+            <div class="modal_header">
+                <h2 id="modal_title">Ajouter une parcelle</h2>
+                <button class="modal_close" onclick="fermerModal()">&times;</button>
+            </div>
+            <form id="formParcelle">
+                <input type="hidden" id="parcelle_id">
+                <div class="form_group">
+                    <label>Nom de la parcelle</label>
+                    <input type="text" id="nom" required>
+                </div>
+                <div class="form_group">
+                    <label>Localisation</label>
+                    <input type="text" id="localisation" required>
+                </div>
+                <div class="form_group">
+                    <label>Surface (ha)</label>
+                    <input type="number" id="surface_ha" step="0.01" required>
+                </div>
+                <div class="modal_footer">
+                    <button type="button" class="btn_annuler" onclick="fermerModal()">Annuler</button>
+                    <button type="submit" class="btn_sauvegarder">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal pour ajouter une observation -->
+    <div id="modalObservation" class="modal">
+        <div class="modal_content">
+            <div class="modal_header">
+                <h2>Ajouter une observation</h2>
+                <button class="modal_close" onclick="fermerModalObs()">&times;</button>
+            </div>
+            <form id="formObservation">
+                <input type="hidden" id="obs_parcelle_id">
+                <p id="obs_parcelle_nom" style="font-weight: bold; color: #3f51b5; margin-bottom: 20px;"></p>
+                <div class="form_group">
+                    <label>Date</label>
+                    <input type="date" id="obs_date" required>
+                </div>
+                <div class="form_group">
+                    <label>État</label>
+                    <select id="obs_etat" required>
+                        <option value="">Sélectionner un état</option>
+                        <option value="OK">OK</option>
+                        <option value="Stress hydrique">Stress hydrique</option>
+                        <option value="Risque maladie">Risque maladie</option>
+                        <option value="Maladie détectée">Maladie détectée</option>
+                    </select>
+                </div>
+                <div class="form_group">
+                    <label>Commentaire</label>
+                    <input type="text" id="obs_commentaire" required placeholder="Ex: Sol sec, Feuilles jaunies...">
+                </div>
+                <div class="modal_footer">
+                    <button type="button" class="btn_annuler" onclick="fermerModalObs()">Annuler</button>
+                    <button type="submit" class="btn_sauvegarder">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Gestion des parcelles
+        function ouvrirModalAjout() {
+            document.getElementById('modal_title').textContent = 'Ajouter une parcelle';
+            document.getElementById('parcelle_id').value = '';
+            document.getElementById('nom').value = '';
+            document.getElementById('localisation').value = '';
+            document.getElementById('surface_ha').value = '';
+            document.getElementById('modalParcelle').style.display = 'flex';
+        }
+
+        function ouvrirModalModification(id, nom, localisation, surface) {
+            document.getElementById('modal_title').textContent = 'Modifier la parcelle';
+            document.getElementById('parcelle_id').value = id;
+            document.getElementById('nom').value = nom;
+            document.getElementById('localisation').value = localisation;
+            document.getElementById('surface_ha').value = surface;
+            document.getElementById('modalParcelle').style.display = 'flex';
+        }
+
+        function fermerModal() {
+            document.getElementById('modalParcelle').style.display = 'none';
+        }
+
+        document.getElementById('formParcelle').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const parcelleId = document.getElementById('parcelle_id').value;
+            const data = {
+                nom: document.getElementById('nom').value,
+                localisation: document.getElementById('localisation').value,
+                surface_ha: parseFloat(document.getElementById('surface_ha').value)
+            };
+
+            const url = parcelleId ? '/api/parcelles/' + parcelleId : '/api/parcelles';
+            const method = parcelleId ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                location.reload();
+            } else {
+                alert(result.message);
+            }
+        });
+
+        async function supprimerParcelle(id, nom) {
+            if (confirm('Supprimer ' + nom + ' ?')) {
+                const response = await fetch('/api/parcelles/' + id, {method: 'DELETE'});
+                const result = await response.json();
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert(result.message);
+                }
+            }
+        }
+
+        // Gestion des observations
+        function ouvrirModalObservation(parcelleId, parcelleNom) {
+            document.getElementById('obs_parcelle_id').value = parcelleId;
+            document.getElementById('obs_parcelle_nom').textContent = 'Parcelle : ' + parcelleNom;
+            document.getElementById('obs_date').value = '';
+            document.getElementById('obs_etat').value = '';
+            document.getElementById('obs_commentaire').value = '';
+            document.getElementById('modalObservation').style.display = 'flex';
+        }
+
+        function fermerModalObs() {
+            document.getElementById('modalObservation').style.display = 'none';
+        }
+
+        document.getElementById('formObservation').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const data = {
+                date: document.getElementById('obs_date').value,
+                etat: document.getElementById('obs_etat').value,
+                parcelle_id: parseInt(document.getElementById('obs_parcelle_id').value),
+                commentaire: document.getElementById('obs_commentaire').value
+            };
+
+            console.log('Données envoyées:', data);
+
+            const response = await fetch('/api/observations', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            console.log('Réponse:', result);
+            
+            if (result.success) {
+                location.reload();
+            } else {
+                alert(result.message);
+            }
+        });
+
+        async function supprimerObservation(id) {
+            if (confirm('Supprimer cette observation ?')) {
+                const response = await fetch('/api/observations/' + id, {method: 'DELETE'});
+                const result = await response.json();
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert(result.message);
+                }
+            }
+        }
+
+       
+    </script>
+
+</body>
+</html>

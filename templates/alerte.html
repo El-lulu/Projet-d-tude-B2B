@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGRI_LTY - Alertes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header class="nav_bar">
+        <div class="logo">AGRI_LTY</div>
+        <a href="/" class="nav_link">Tableau de Bord</a>
+        <a href="/parcelles" class="nav_link">Mes Parcelles</a>
+        <a href="/alerte" class="nav_link">Alerte</a>
+        <a href="/meteo" class="nav_link">Météo</a>
+    </header>
+
+    <main class="container">
+        <div class="page_header">
+            <h1 class="dashboard_title">Alertes</h1>
+            <button class="btn_add_parcelle" onclick="ouvrirModalAjout()">
+                <span class="btn_icon">+</span> Ajouter une alerte
+            </button>
+        </div>
+
+        <div class="alerts_summary">
+            <div class="summary_card">
+                <div class="summary_dot dot_blue_light"></div>
+                <div class="summary_text">
+                    <strong>{{ historique|selectattr('niveau', 'equalto', 1)|list|length }}</strong>
+                    <span>Niveau 1 — Vigilance</span>
+                </div>
+            </div>
+            <div class="summary_card">
+                <div class="summary_dot dot_blue_mid"></div>
+                <div class="summary_text">
+                    <strong>{{ historique|selectattr('niveau', 'equalto', 2)|list|length }}</strong>
+                    <span>Niveau 2 — Attention</span>
+                </div>
+            </div>
+            <div class="summary_card">
+                <div class="summary_dot dot_blue_dark"></div>
+                <div class="summary_text">
+                    <strong>{{ historique|selectattr('niveau', 'equalto', 3)|list|length }}</strong>
+                    <span>Niveau 3 — Critique</span>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="section_subtitle">Toutes les alertes</h3>
+
+        <div class="alert_history_container">
+            {% for a in historique %}
+            <div class="alert_history_item">
+                <div class="alert_left_content">
+                    <div class="badge_n{{ a['niveau'] }}">N{{ a['niveau'] }}</div>
+                    <div class="alert_info_side">
+                        <strong>{{ a['type'] }}</strong>
+                        <small>Parcelle : {{ a['parcelle_nom'] }}</small>
+                    </div>
+                </div>
+                <div class="alert_right_content">
+                    <div class="obs_date">{{ a['date'] }}</div>
+                    <div class="alert_actions">
+                        <button class="btn_modifier_small" onclick="ouvrirModalModification({{ a['id'] }}, '{{ a['date'] }}', '{{ a['type'] }}', {{ a['parcelle_id'] }}, {{ a['niveau'] }})">✏️</button>
+                        <button class="btn_supprimer_small" onclick="supprimerAlerte({{ a['id'] }}, '{{ a['type'] }}')">🗑️</button>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <p class="no_obs">Aucune alerte enregistrée dans l'historique.</p>
+            {% endfor %}
+        </div>
+    </main>
+
+    <div id="modalAlerte" class="modal">
+        <div class="modal_content">
+            <div class="modal_header">
+                <h2 id="modal_title">Ajouter une alerte</h2>
+                <button class="modal_close" onclick="fermerModal()">&times;</button>
+            </div>
+            <form onsubmit="sauvegarderAlerte(event)">
+                <input type="hidden" id="alerte_id">
+                <div class="form_group">
+                    <label>Date</label>
+                    <input type="date" id="date" required>
+                </div>
+                <div class="form_group">
+                    <label>Type d'alerte</label>
+                    <select id="type" required>
+                        <option value="">Sélectionner un type</option>
+                        <option value="Stress hydrique">Stress hydrique</option>
+                        <option value="Risque maladie">Risque maladie</option>
+                        <option value="Maladie détectée">Maladie détectée</option>
+                    </select>
+                </div>
+                <div class="form_group">
+                    <label>Parcelle concernée</label>
+                    <select id="parcelle_id" required>
+                        <option value="">Sélectionner une parcelle</option>
+                        {% for p in parcelles %}
+                        <option value="{{ p['id'] }}">{{ p['nom'] }} ({{ p['localisation'] }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form_group">
+                    <label>Niveau d'alerte</label>
+                    <select id="niveau" required>
+                        <option value="">Sélectionner un niveau</option>
+                        <option value="1">Niveau 1 - Vigilance</option>
+                        <option value="2">Niveau 2 - Attention</option>
+                        <option value="3">Niveau 3 - Critique</option>
+                    </select>
+                </div>
+                <div class="modal_footer">
+                    <button type="button" class="btn_annuler" onclick="fermerModal()">Annuler</button>
+                    <button type="submit" class="btn_sauvegarder">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function ouvrirModalAjout() {
+            document.getElementById('modal_title').textContent = 'Ajouter une alerte';
+            document.getElementById('alerte_id').value = '';
+            document.getElementById('date').value = '';
+            document.getElementById('type').value = '';
+            document.getElementById('parcelle_id').value = '';
+            document.getElementById('niveau').value = '';
+            document.getElementById('modalAlerte').style.display = 'flex';
+        }
+
+        function ouvrirModalModification(id, date, type, parcelle_id, niveau) {
+            document.getElementById('modal_title').textContent = "Modifier l'alerte";
+            document.getElementById('alerte_id').value = id;
+            document.getElementById('date').value = date;
+            document.getElementById('type').value = type;
+            document.getElementById('parcelle_id').value = parcelle_id;
+            document.getElementById('niveau').value = niveau;
+            document.getElementById('modalAlerte').style.display = 'flex';
+        }
+
+        function fermerModal() {
+            document.getElementById('modalAlerte').style.display = 'none';
+        }
+
+        async function sauvegarderAlerte(event) {
+            event.preventDefault();
+            const alerteId = document.getElementById('alerte_id').value;
+            const data = {
+                date: document.getElementById('date').value,
+                type: document.getElementById('type').value,
+                parcelle_id: parseInt(document.getElementById('parcelle_id').value),
+                niveau: parseInt(document.getElementById('niveau').value)
+            };
+
+            const url = alerteId ? `/api/alertes/${alerteId}` : '/api/alertes';
+            const method = alerteId ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                location.reload();
+            } else {
+                alert(result.message);
+            }
+        }
+
+        async function supprimerAlerte(id, type) {
+            if (confirm(`Supprimer l'alerte "${type}" ?`)) {
+                const response = await fetch(`/api/alertes/${id}`, {method: 'DELETE'});
+                const result = await response.json();
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert(result.message);
+                }
+            }
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalAlerte');
+            if (event.target === modal) {
+                fermerModal();
+            }
+        }
+    </script>
+
+</body>
+</html>
